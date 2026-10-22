@@ -1,4 +1,5 @@
 local spec = require('cmp.utils.spec')
+local config = require('cmp.config')
 local entry = require('cmp.entry')
 local custom_entries_view = require('cmp.view.custom_entries_view')
 
@@ -40,6 +41,16 @@ describe('custom_entries_view', function()
     local view = open(string.rep('a', 65), 20)
     local info = view:info()
     assert.is_true(info.col + info.width <= vim.o.columns)
+    view:close()
+  end)
+
+  it('checks the fit at the column shifted by col_offset', function()
+    vim.o.columns = 80
+    config.set_global({ window = { completion = { col_offset = -10 } } })
+    local view = open(string.rep('a', 65), 20)
+    local info = view:info()
+    -- Only moved as far left as needed to fit, not col_offset further.
+    assert.are.equal(vim.o.columns - 1, info.col + info.width)
     view:close()
   end)
 
